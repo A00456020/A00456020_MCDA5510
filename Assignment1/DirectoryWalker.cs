@@ -6,10 +6,16 @@ namespace DirectoryWalker
 {
     public class DirectoryWalker
     {
+        public static string path = "P:\\Sample Data";
+        public static string output_path = "P:\\Output\\Output.csv";
         public static string log_directory = "P:\\logs";
         public static string log_path = "P:\\logs\\logs.txt";
+
+
         public static FileStream logstream = File.OpenWrite(log_path);
         public static StreamWriter logfile = new StreamWriter(logstream);
+
+
         public static void LogInfo(string log_dir, string[] info)
         {
             if (!Directory.Exists(log_dir))
@@ -29,6 +35,7 @@ namespace DirectoryWalker
         public static string[] ListDirectories(string root_path)
         {
             System.Collections.Generic.List<string> dirs = new System.Collections.Generic.List<string>();
+            dirs.Add(root_path);
             foreach (string dir_name in Directory.GetDirectories(root_path))
             {
                 dirs.Add(dir_name);
@@ -121,14 +128,11 @@ namespace DirectoryWalker
         {
 
             var timestamp = System.Diagnostics.Stopwatch.StartNew();
-            string path = "P:\\Sample Data";
             Directory.CreateDirectory("P:\\Output");
-            string output_path = "P:\\Output\\Output.csv";
-            string log_path = "P:\\logs";
+            Directory.CreateDirectory(log_directory);
+
 
             System.Collections.Generic.List<string> outrecords = new System.Collections.Generic.List<string>();
-            string skipped_path = "P:\\Output\\SkippedOutput.csv";
-
             string[] directories = ListDirectories(path);
             string[] files = ListCsvFiles(directories);
             string[][] total_records = ProcessFiles(files);
@@ -151,24 +155,17 @@ namespace DirectoryWalker
             timestamp.Stop();
             long totaltime = timestamp.ElapsedMilliseconds;
 
-
-            if (File.Exists(skipped_path))
-            {
-                File.Delete(skipped_path);
-            }
-            FileStream outstream2 = File.Create(skipped_path);
-            StreamWriter outfile2 = new StreamWriter(outstream2);
             int sk_count = 1;
             foreach (string record in invalid_records)
             {
                 sk_count++;
                 //outrecords.Add(record);
-                outfile2.WriteLine(record);
+                //outfile2.WriteLine(record);
             }
-            outfile2.Close();
-            logfile.WriteLine("\n\nTotal Valid rows are " + count + "\n");
-            logfile.WriteLine("\n\nTotal skipped rows are " + sk_count + "\n");
-            logfile.WriteLine("\nTotal execution time is " + totaltime + " miliseconds, that is " + totaltime / 1000 + " seconds.");
+            //outfile2.Close();
+            logfile.WriteLine("\n\nTotal Valid rows are " + count);
+            logfile.WriteLine("\nTotal skipped rows are " + sk_count + "\n");
+            logfile.WriteLine("\nTotal execution time is " + totaltime + " miliseconds, that is approximately " + totaltime / 1000 + " seconds.");
             logfile.Close();
         }
     }
