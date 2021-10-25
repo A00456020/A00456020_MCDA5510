@@ -127,7 +127,7 @@ namespace DirectoryWalker
             string log_path = "P:\\logs";
 
             System.Collections.Generic.List<string> outrecords = new System.Collections.Generic.List<string>();
-            //string skipped_path = "P:\\Output\\SkippedOutput.csv";
+            string skipped_path = "P:\\Output\\SkippedOutput.csv";
 
             string[] directories = ListDirectories(path);
             string[] files = ListCsvFiles(directories);
@@ -150,22 +150,25 @@ namespace DirectoryWalker
             outfile.Close();
             timestamp.Stop();
             long totaltime = timestamp.ElapsedMilliseconds;
-            logfile.WriteLine("\nTotal execution time is " + totaltime + " miliseconds, that is " + totaltime / 1000 + " seconds.");
 
-            //if (File.Exists(skipped_path))
-            //{
-            //    File.Delete(skipped_path);
-            //}
-            //FileStream outstream2 = File.Create(skipped_path);
-            //StreamWriter outfile2 = new StreamWriter(outstream2);
-            //int sk_count = 1;
-            //foreach (string record in invalid_records)
-            //{
-            //    sk_count++;
-            //    //outrecords.Add(record);
-            //    outfile2.WriteLine(record);
-            //}
-            //outfile2.Close();
+
+            if (File.Exists(skipped_path))
+            {
+                File.Delete(skipped_path);
+            }
+            FileStream outstream2 = File.Create(skipped_path);
+            StreamWriter outfile2 = new StreamWriter(outstream2);
+            int sk_count = 1;
+            foreach (string record in invalid_records)
+            {
+                sk_count++;
+                //outrecords.Add(record);
+                outfile2.WriteLine(record);
+            }
+            outfile2.Close();
+            logfile.WriteLine("\n\nTotal Valid rows are " + count + "\n");
+            logfile.WriteLine("\n\nTotal skipped rows are " + sk_count + "\n");
+            logfile.WriteLine("\nTotal execution time is " + totaltime + " miliseconds, that is " + totaltime / 1000 + " seconds.");
             logfile.Close();
         }
     }
