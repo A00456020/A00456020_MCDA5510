@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Assignment1"
+    "\\Assignment1",
+    "\\Assignment1\\Output"
   ],
-  "SelectedNode": "\\Assignment1\\DirectoryWalker.sln",
+  "SelectedNode": "\\Assignment1\\Output\\Output.csv",
   "PreviewInSolutionExplorer": false
 }

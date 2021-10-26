@@ -7,41 +7,26 @@ namespace DirectoryWalker
     public class DirectoryWalker
     {
         public static string path = "P:\\Sample Data";
-        public static string output_path = "P:\\Output\\Output.csv";
-        public static string log_directory = "P:\\logs";
-        public static string log_path = "P:\\logs\\logs.txt";
+        public static DirectoryInfo outdir = Directory.CreateDirectory("Output");
+        public static DirectoryInfo loggingdir = Directory.CreateDirectory("logs");
+        public static string output_path = "Output\\Output.csv";
+        public static string log_directory = "logs";
+        public static string log_path = "logs\\logs.txt";
 
-
-        public static FileStream logstream = File.OpenWrite(log_path);
+        public static FileStream logstream = File.Create(log_path);
         public static StreamWriter logfile = new StreamWriter(logstream);
-
-
-        public static void LogInfo(string log_dir, string[] info)
-        {
-            if (!Directory.Exists(log_dir))
-            {
-                Directory.CreateDirectory(log_dir);
-            }
-            string log_path = log_dir + "\\" + "logs.txt";
-            FileStream logstream = File.OpenWrite(log_path);
-
-            StreamWriter logfile = new StreamWriter(logstream);
-            foreach (string line in info)
-            {
-                logfile.WriteLine(line);
-            }
-            logfile.Close();
-        }
         public static string[] ListDirectories(string root_path)
         {
             System.Collections.Generic.List<string> dirs = new System.Collections.Generic.List<string>();
-            dirs.Add(root_path);
             foreach (string dir_name in Directory.GetDirectories(root_path))
             {
                 dirs.Add(dir_name);
                 if (Directory.Exists(dir_name))
                 {
-                    dirs.AddRange(ListDirectories(dir_name));
+                    if (!dir_name.Contains("__MACOSX"))
+                    {
+                        dirs.AddRange(ListDirectories(dir_name));
+                    }
                 }
             }
             return dirs.ToArray();
@@ -90,7 +75,6 @@ namespace DirectoryWalker
                     {
                         string[] fields = fileReader.ReadFields();
                         string record = string.Empty;
-                        //Console.WriteLine(fields[0]);
                         if (fields[0].Contains("First Name"))
                         {
                             continue;
@@ -126,6 +110,9 @@ namespace DirectoryWalker
         }
         public static void Main(string[] args)
         {
+            logfile.WriteLine("log created for \"DirectoryWalker.cs\" file.");
+            logfile.WriteLine("started logging the information from below this section");
+            logfile.WriteLine("at the end of the logs, total valid rows, total invalid rows and total execution time has been logged\n\n");
 
             var timestamp = System.Diagnostics.Stopwatch.StartNew();
             Directory.CreateDirectory("P:\\Output");
@@ -133,7 +120,13 @@ namespace DirectoryWalker
 
 
             System.Collections.Generic.List<string> outrecords = new System.Collections.Generic.List<string>();
-            string[] directories = ListDirectories(path);
+            System.Collections.Generic.List<string> directoriesList = new System.Collections.Generic.List<string>();
+            directoriesList.Add(path);
+            foreach (string dirs in ListDirectories(path))
+            {
+                directoriesList.Add(dirs);
+            }
+            string[] directories = directoriesList.ToArray();
             string[] files = ListCsvFiles(directories);
             string[][] total_records = ProcessFiles(files);
             string[] invalid_records = total_records[1];
@@ -159,12 +152,9 @@ namespace DirectoryWalker
             foreach (string record in invalid_records)
             {
                 sk_count++;
-                //outrecords.Add(record);
-                //outfile2.WriteLine(record);
             }
-            //outfile2.Close();
             logfile.WriteLine("\n\nTotal Valid rows are " + count);
-            logfile.WriteLine("\nTotal skipped rows are " + sk_count + "\n");
+            logfile.WriteLine("\nTotal skipped rows are " + sk_count);
             logfile.WriteLine("\nTotal execution time is " + totaltime + " miliseconds, that is approximately " + totaltime / 1000 + " seconds.");
             logfile.Close();
         }
